@@ -16,17 +16,22 @@ import time
 import pandas as pd
 import streamlit as st
 from sklearn.metrics import accuracy_score
+from sklearn.preprocessing import MinMaxScaler
 
-# scaler = MinMaxScaler()
+df_smote_normal = pd.read_csv('df_smote_normal.csv')
 
-df_final = pd.read_csv('df_smote_normal.csv')
+df_final = pd.read_csv('df_smote.csv')
+
 
 X = df_final.drop("target", axis=1)
 y = df_final['target']
 
-model = pickle.load(open("model/knn_tuning.pkl", 'rb'))
+scaler = MinMaxScaler()
+X_normal = scaler.fit_transform(X)
 
-y_pred = model.predict(X)
+knn_model = pickle.load(open("model/knn_tuning.pkl", 'rb'))
+
+y_pred = knn_model.predict(X_normal)
 accuracy = accuracy_score(y, y_pred)
 accuracy = round((accuracy * 100), 2)
 
@@ -158,7 +163,8 @@ with tab1:
   st.write("")
   if predict_btn:
     inputs = [[age, sex, cp, trestbps, chol, fbs, restecg, thalach, exang, oldpeak]]
-    prediction = knn_model.predict(inputs)[0]
+    input_normal = scaler.transform(inputs)
+    prediction = knn_model.predict(input_normal)[0]
 
     bar = st.progress(0)
     status_text = st.empty()
