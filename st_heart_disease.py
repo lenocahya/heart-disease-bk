@@ -15,16 +15,24 @@ import time
 
 import pandas as pd
 import streamlit as st
+from sklearn.metrics import accuracy_score
 
 # scaler = MinMaxScaler()
 
-df_final = pd.read_csv('df_clean.csv')
+df_final = pd.read_csv('df_smote_normal.csv')
 
-with open('knn_tuning.pkl', 'rb') as file:
-    knn_model = pickle.load(file)
+X = df_final.drop("target", axis=1)
+y = df_final['target']
 
+model = pickle.load(open("model/knn_tuning.pkl", 'rb'))
 
-# y_pred_knn = knn_model.predict(X_test)
+y_pred = model.predict(X)
+accuracy = accuracy_score(y, y_pred)
+accuracy = round((accuracy * 100), 2)
+
+# ======================================
+# Memulai Streamlit
+# ======================================
 
 
 # Memulai Streamlit
@@ -34,7 +42,7 @@ st.set_page_config(
 )
 
 st.title("Hungarian Heart Disease")
-# st.write(f"**_Model's Accuracy_** :  :green[**{accuracy}**]% (:red[_Do not copy outright_])")
+st.write(f"**_Model's Accuracy_** :  :green[**{accuracy}**]% (:red[_Do not copy outright_])")
 st.write("")
 
 tab1, tab2 = st.tabs(["Single-predict", "Multi-predict"])
